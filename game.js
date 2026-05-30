@@ -3827,8 +3827,24 @@ function Ki(_0x493296) {
     _raw: _0x20f60e
   };
 }
+// Locate function Zi(_0x38fc47) inside your game.js and insert this fallback wrapper right at the top:
 function Zi(_0x38fc47) {
+  // --- 2.2 Compatibility Processing Injector ---
+  if (_0x38fc47 && (_0x38fc47.includes("kA13,") || _0x38fc47.includes(";1,1848"))) {
+      console.log("Modern 2.2 level architecture detected. Standardizing structures...");
+      // Safely strip or translate 2.2 explicit camera triggers (IDs: 1913, 1914, 1916) to avoid infinite loops
+      _0x38fc47 = _0x38fc47.replace(/;1,1913,[^;]+/g, '')
+                           .replace(/;1,1914,[^;]+/g, '')
+                           .replace(/;1,1916,[^;]+/g, '');
+      
+      // Map 2.2 Swing copter structures (1848) down to a stable runtime fallback portal (Ball)
+      _0x38fc47 = _0x38fc47.replace(/,1,1848,/g, ',1,22,');
+  }
+  // --- End of Compatibility Block ---
+
+  // Original decryption pipeline (atob, qi.inflate, split(';')) starts here:
   let _0x103676 = function (_0x510333) {
+      // Existing decompression pipeline...
     let _0x48af37 = function (_0x597b77) {
       let _0x4e5b39 = _0x597b77.replace(/-/g, '+').replace(/_/g, '/');
       for (; _0x4e5b39.length % 0x4 != 0x0;) {
@@ -3950,6 +3966,15 @@ const OBJECT_DEFS = {
     hitboxScaleX: 0.2,
     hitboxScaleY: 0.4
   },
+  // Add these directly inside the existing OBJECT_DEFS object dictionary:
+0x22: { type: "portal_ball", frame: "d_portal_03_001.png", gridW: 0x2, gridH: 0x3 }, // Ball Portal (ID 34)
+0x23: { type: "portal_cube", frame: "d_portal_01_001.png", gridW: 0x2, gridH: 0x3 }, // Cube Portal (ID 35) fallback
+0x24: { type: "jump_ring_pink", frame: "ring_pink_001.png", gridW: 0x1, gridH: 0x1 }, // Pink Orb (ID 36)
+0x8d: { type: "jump_ring_red", frame: "ring_red_001.png", gridW: 0x1, gridH: 0x1 },   // Red Orb (ID 141)
+0x54: { type: "boost_pad_pink", frame: "pad_pink_001.png", gridW: 0x1, gridH: 0x1 },  // Pink Pad (ID 84)
+0x2d: { type: "portal_mirror_start", frame: "portal_04_front_001.png", gridW: 0x1, gridH: 0x3 }, // Mirror (ID 45)
+0x2e: { type: "portal_mirror_end", frame: "portal_04_back_001.png", gridW: 0x1, gridH: 0x3 },   // Mirror End (ID 46)
+0x738: { type: "portal_swing", frame: "d_portal_swing_001.png", gridW: 0x2, gridH: 0x3 }, // 2.2 Swing Copter Portal (ID 1848)
   0x67: {
     type: OBJ_HAZARD,
     frame: 'spike_03_001.png',
@@ -6809,10 +6834,28 @@ class ps {
   ["playerIsFalling"]() {
     return this.p.gravityFlipped ? this.p.yVelocity > 3.832796 : this.p.yVelocity < 3.832796;
   }
-  ['updateJump'](_0x3d1c6f) {
-    if (this.p.isFlying) {
-      this._updateFlyJump(_0x3d1c6f);
-    } else {
+  [// Replace or patch the top of your updateJump(_0x3d1c6f) method:
+updateJump(_0x3d1c6f) {
+  // 1. If we are in the Ball or Swing Copter mode
+  if (this.p.isBallMode || this.p.type === "ball" || this.p.type === "swing") {
+    if (this.p.upKeyDown && this.p.canJump) {
+      this.p.gravityFlipped = !this.p.gravityFlipped; // Flip gravity vector instantly
+      this.p.onGround = false;
+      this.p.canJump = false; // Block continuous multi-activation per-tap
+      this.p.upKeyPressed = false;
+      this.p.yVelocity = 12.5 * this.flipMod(); // Controlled snappy transition speed
+      this.runRotateAction();
+    }
+    // Apply standard inverted gravity force calculation
+    this.p.yVelocity -= 1.916398 * _0x3d1c6f * this.flipMod();
+    return;
+  }
+
+  // 2. Existing Fly/Ship logic wrapper
+  if (this.p.isFlying) {
+    this._updateFlyJump(_0x3d1c6f);
+  } else {
+    // Standard Cube logic continues here...
       if (this.p.upKeyDown && this.p.canJump) {
         this.p.isJumping = true;
         this.p.onGround = false;
